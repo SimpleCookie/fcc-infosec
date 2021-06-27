@@ -1,20 +1,15 @@
 'use strict';
 const axios = require('axios');
+const { addLike, getLikesByStock } = require("../service/db")
 const apiUrl = symbol => `https://stock-price-checker-proxy.freecodecamp.rocks/v1/stock/${symbol}/quote`
 
-const likes = {}
-const addLikes = stocks => {
-  stocks.forEach(stock => {
-    likes[stock] = likes[stock] ? likes[stock]++ : 1
-  })
-}
+const byIp = _ip => it => it.ip === _ip
 const notFound = "Not found"
 module.exports = function (app) {
 
   app.route('/api/stock-prices')
     .get(async (req, res) => {
       const ip = req.header('x-forwarded-for') || req.connection.remoteAddress;
-      console.log("ip", ip)
       const { stock, like } = req.query
 
       try {
@@ -24,11 +19,12 @@ module.exports = function (app) {
             res.send(notFound)
             return
           }
+          const likes = (await getLikesByStock(stock)).filter(byIp(ip))
           if (like === "true") {
-            addLikes([stock])
+            if (likes.length < 1) await addLike({ ip, stock })
           }
-          const stockData = { stock, price: data.latestPrice, likes: likes[stock] || 0 }
-          console.log({ stockData })
+          const newLikes = (await getLikesByStock(stock)).filter(byIp(ip))
+          const stockData = { stock, price: data.latestPrice, likes: newLikes.length }
           res.send({ stockData })
           return
         }
@@ -45,19 +41,29 @@ module.exports = function (app) {
           return
         }
 
-        if (like === "true") addLikes([stock1, stock2])
+        const likes1 = (await getLikesByStock(stock1)).filter(byIp(ip))
+        const likes2 = (await getLikesByStock(stock2)).filter(byIp(ip))
+        if (like === "true") {
+          if (likes1.length < 1) {
+            await addLike({ ip, stock1 })
+          }
+          if (likes2.length < 1) {
+            await addLike({ ip, stock2 })
+          }
+        }
+        const newLikes1 = (await getLikesByStock(stock1)).filter(byIp(ip))
+        const newLikes2 = (await getLikesByStock(stock2)).filter(byIp(ip))
 
         const stockData = [{
           stock: stock1,
           price: result1.data.latestPrice,
-          rel_likes: likes[stock1] - likes[stock2] || 0
+          rel_likes: newLikes1.length - newLikes2.length
         },
         {
           stock: stock2,
           price: result2.data.latestPrice,
-          rel_likes: likes[stock2] - likes[stock1] || 0
+          rel_likes: newLikes2.length - newLikes1.length
         }]
-        console.log({ stockData })
         res.send({ stockData })
       } catch (error) {
         console.error(error)
