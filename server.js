@@ -10,13 +10,12 @@ const fccTestingRoutes = require('./routes/fcctesting.js');
 const runner = require('./test-runner');
 
 const app = express();
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "trusted-cdn.com"],
-    }
-  }
+app.use(helmet())
+app.use(helmet.contentSecurityPolicy({
+  directives: {
+    defaultSrc: ["'self'"],
+    scriptSrc: ["'self'", "trusted-cdn.com"],
+  },
 }))
 
 app.use('/public', express.static(process.cwd() + '/public'));
