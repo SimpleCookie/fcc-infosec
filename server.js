@@ -11,7 +11,6 @@ const runner = require('./test-runner');
 const ninetyDaysInSeconds = 90 * 24 * 60 * 60
 
 const app = express();
-app.use(helmet()) // This should be equivalent to the other helmet calls below! GRR!!!
 app.use(helmet.hidePoweredBy())
 app.use(helmet.frameguard({ action: 'deny' }))
 app.use(helmet.xssFilter())
