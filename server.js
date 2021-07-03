@@ -22,7 +22,7 @@ app.use(helmet.noCache())
 app.use(helmet.contentSecurityPolicy({
   directives: {
     scriptSrc: ["'self'"],
-    styleSrc: ["'self"]
+    styleSrc: ["'self'"]
   }
 }))
 
