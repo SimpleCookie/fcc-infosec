@@ -21,7 +21,8 @@ app.use(helmet.dnsPrefetchControl())
 app.use(helmet.noCache())
 app.use(helmet.contentSecurityPolicy({
   directives: {
-    defaultSrc: ["'self'"]
+    scriptSrc: ["'self'"],
+    styleSrc: ["'self"]
   }
 }))
 
