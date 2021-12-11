@@ -11,20 +11,25 @@ const runner = require("./test-runner");
 
 const app = express();
 const daysInSeconds = 90 * 86400;
-app.use(helmet.hidePoweredBy());
-app.use(helmet.frameguard({ action: "deny" }));
-app.use(helmet.xssFilter());
-app.use(helmet.noSniff());
-app.use(helmet.ieNoOpen());
 app.use(helmet.hsts({ maxAge: daysInSeconds, force: true }));
-app.use(helmet.dnsPrefetchControl());
-app.use(helmet.noCache());
 app.use(
   helmet.contentSecurityPolicy({
     directives: {
       scriptSrc: ["'self'"],
       styleSrc: ["'self'"],
     },
+  })
+);
+app.use(
+  helmet({
+    // ieNoOpen: true,
+    // noSniff: true,
+    noCache: true,
+    hidePoweredBy: { setTo: "PHP 4.2.0" },
+    xssFilter: true,
+    frameguard: { action: "sameorigin" },
+    dnsPrefetchControl: { allow: false },
+    referrerPolicy: { policy: "same-origin" },
   })
 );
 
