@@ -11,28 +11,23 @@ const runner = require("./test-runner");
 
 const app = express();
 const daysInSeconds = 90 * 86400;
-app.use(helmet.hsts({ maxAge: daysInSeconds, force: true }));
-app.use(
-  helmet.contentSecurityPolicy({
-    directives: {
-      scriptSrc: ["'self'"],
-      styleSrc: ["'self'"],
-    },
-  })
-);
 app.use(
   helmet({
-    // ieNoOpen: true,
-    // noSniff: true,
+    contentSecurityPolicy: {
+      directives: {
+        scriptSrc: ["'self'"],
+        styleSrc: ["'self'"],
+      },
+    },
+    hsts: { maxAge: daysInSeconds, force: true },
     noCache: true,
     hidePoweredBy: { setTo: "PHP 4.2.0" },
     xssFilter: true,
     frameguard: { action: "sameorigin" },
-    dnsPrefetchControl: { allow: false },
     referrerPolicy: { policy: "same-origin" },
   })
 );
-
+app.use(helmet.dnsPrefetchControl({ allow: false }));
 app.use("/public", express.static(process.cwd() + "/public"));
 
 app.use(cors({ origin: "*" })); //For FCC testing purposes only
