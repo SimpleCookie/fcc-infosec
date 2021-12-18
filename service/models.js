@@ -1,4 +1,4 @@
-export const msg = ({
+const msg = ({
   board,
   text,
   delete_password,
@@ -7,7 +7,7 @@ export const msg = ({
   reported,
   replies = [],
 }) => {
-  const date = new Date().toISOString();
+  const date = new Date().toISOString()
   return {
     board,
     text,
@@ -16,14 +16,19 @@ export const msg = ({
     bumped_on: bumped_on || date,
     reported: reported || false,
     replies,
-  };
-};
+  }
+}
 
-export const reply = ({ text, delete_password, created_on, reported }) => {
+const reply = ({ text, delete_password, created_on, reported }) => {
   return {
     text,
     delete_password,
     created_on: created_on || new Date().toISOString(),
     reported: reported || false,
-  };
-};
+  }
+}
+
+module.exports = {
+  msg,
+  reply,
+}
